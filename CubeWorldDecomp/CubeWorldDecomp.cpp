@@ -6,25 +6,24 @@
 #include <fstream>
 #include <string>
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WindowProc(HWND h_wnd, UINT u_msg, WPARAM w_param, LPARAM l_param);
 bool init_renderer();
 void parse_options_config(OptionsConfig* options_config);
 
 int WINAPI wWinMain(
-	_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR lpCmdLine,
-	_In_ int nShowCmd
+	_In_ HINSTANCE h_instance,
+	_In_opt_ HINSTANCE h_prev_instance,
+	_In_ LPWSTR lp_cmnd_line,
+	_In_ int n_show_cmd
 ) {
-	HINSTANCE v6 = hInstance;
-	HINSTANCE previous_time = hInstance;
+	HINSTANCE v6 = h_instance;
 
 	WNDCLASSW wnd_class = {};
 	wnd_class.style = 0;
-	wnd_class.lpfnWndProc = WndProc;
+	wnd_class.lpfnWndProc = WindowProc;
 	wnd_class.cbClsExtra = 0;
 	wnd_class.cbWndExtra = 0;
-	wnd_class.hInstance = hInstance;
+	wnd_class.hInstance = h_instance;
 	/*wnd_class.hIcon = LoadIconW(hInstance, APP_NAME);*/
 	wnd_class.hCursor = 0;
 	wnd_class.hbrBackground = (HBRUSH) 6;
@@ -34,11 +33,11 @@ int WINAPI wWinMain(
 	if (!RegisterClassW(&wnd_class))
 		return 0;
 
-	H_WND = CreateWindowExW(0, APP_NAME, APP_NAME, 0x6CF0000u, 200, 200, 800, 600, 0, 0, hInstance, 0);
+	H_WND = CreateWindowExW(0, APP_NAME, APP_NAME, 0x6CF0000u, 200, 200, 800, 600, 0, 0, h_instance, 0);
 	if (!H_WND)
 		return 0;
 
-	if (!init_renderer()) { // TODO: Init direct3d
+	if (!init_renderer()) {
 		MessageBoxA(
 			H_WND,
 			"Could not initialize Direct3D. Please make sure the latest DirectX End-User Runtime is installed: http://www.microsoft.com/en-us/download/details.aspx?id=35",
@@ -78,21 +77,128 @@ int WINAPI wWinMain(
 
 	parse_options_config(&OPTIONS_CONFIG);
 
+	
+	XAudio2Engine xaudio2_engine = XAudio2Engine();
+	if (!xaudio2_engine.init_audio()) {
+		MessageBoxA(
+			H_WND,
+			"Could not initialize XAudio2. Please make sure the latest DirectX End-User Runtime is installed: http://www.microsoft.com/en-us/download/details.aspx?id=35",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	// xaudio2_engine.some_func(...);
+
+	LPDIRECTINPUT8 p_di = nullptr;
+	HRESULT result = DirectInput8Create(h_instance, DIRECTINPUT_VERSION, IID_IDirectInput8W, (void**) &p_di, nullptr);
+	if (FAILED(result)) {
+		MessageBoxA(
+			H_WND,
+			"Could not initialize DirectInput8. Please make sure the latest DirectX End-User Run time is installed: http://www.microsoft.com/en-us/download/details.aspx?id=35",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	/*
+		KEYBOARD
+	*/
+	IDirectInputDevice8W* keyboard_device = nullptr;
+	p_di->CreateDevice(GUID_SysKeyboard, &keyboard_device, nullptr);
+	// Bug-fix, not in original CubeWorld Alpha
+	if (FAILED(result)) {
+		MessageBoxA(
+			H_WND,
+			"Failed to initialize Keyboard device",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	result = keyboard_device->SetDataFormat(&c_dfDIKeyboard);
+	// Bug-fix, not in original CubeWorld Alpha
+	if (FAILED(result)){
+		MessageBoxA(
+			H_WND,
+			"Failed to Keyboard device data format",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	// Bug-fix, not in original CubeWorld Alpha
+	result = keyboard_device->SetCooperativeLevel(H_WND, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	if (FAILED(result)) {
+		MessageBoxA(
+			H_WND,
+			"Failed to set Keyboard device cooperation level",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	keyboard_device->Acquire();
+
+	/*
+		MOUSE
+	*/
+	IDirectInputDevice8W* mouse_device = nullptr;
+	p_di->CreateDevice(GUID_SysMouse, &mouse_device, nullptr);
+	// Bug-fix, not in original CubeWorld Alpha
+	if (FAILED(result)) {
+		MessageBoxA(
+			H_WND,
+			"Failed to initialize Mouse device",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	result = mouse_device->SetDataFormat(&c_dfDIMouse);
+	// Bug-fix, not in original CubeWorld Alpha
+	if (FAILED(result)) {
+		MessageBoxA(
+			H_WND,
+			"Failed to Mosue device data format",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	// Bug-fix, not in original CubeWorld Alpha
+	result = mouse_device->SetCooperativeLevel(H_WND, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	if (FAILED(result)) {
+		MessageBoxA(
+			H_WND,
+			"Failed to set Mouse device cooperation level",
+			"Cube World",
+			0
+		);
+
+		return 1;
+	}
+
+	result = mouse_device->Acquire();
+
 	// Custom stdout behavior
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
-
-	//if (!true) { // TODO: Init xaudio2
-	//	MessageBoxA(
-	//		H_WND,
-	//		"Could not initialize XAudio2. Please make sure the latest DirectX End-User Runtime is installed: http://www.microsoft.com/en-us/download/details.aspx?id=35",
-	//		"Cube World",
-	//		0
-	//	);
-
-	//	return 0;
-	//}
 
 	//// TODO: Initialize DirectInput8
 
@@ -106,7 +212,6 @@ int WINAPI wWinMain(
 
 	MSG msg;
 	while (true) {
-		previous_time = (HINSTANCE) timeGetTime();
 		if (PeekMessageW(&msg, nullptr, 0u, 0u, 0u)) {
 			if (!GetMessageW(&msg, nullptr, 0u, 0u))
 				break;
@@ -115,10 +220,15 @@ int WINAPI wWinMain(
 		}
 	}
 
+	if (DIRECT3D_OBJ)
+		DIRECT3D_OBJ->Release();
+	if (DIRECT3D_DEVICE)
+		DIRECT3D_DEVICE->Release();
+
 	return 0;
 }
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	LRESULT result;
 	
 	// Check for mouse events

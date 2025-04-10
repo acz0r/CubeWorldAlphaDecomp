@@ -23,6 +23,18 @@
     <ClCompile Include="CubeWorldDecomp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XAudio2Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D9Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CubeWorldDecomp.rc">
@@ -38,6 +50,8 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="options.cfg" />
+    <None Include="options.cfg">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

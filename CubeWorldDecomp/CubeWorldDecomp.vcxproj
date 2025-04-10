@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -130,7 +130,11 @@
     <ClInclude Include="CubeWorldDecomp.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CubeShader.cpp" />
     <ClCompile Include="CubeWorldDecomp.cpp" />
+    <ClCompile Include="D3D9Engine.cpp" />
+    <ClCompile Include="GameController.cpp" />
+    <ClCompile Include="XAudio2Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CubeWorldDecomp.rc" />
