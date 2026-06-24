@@ -1,4 +1,6 @@
 # CubeWorldAlphaDecomp
 
+* Not being updated as of now
+
 (HEAVY WIP)
 A Ghidra-assisted decomp of the original CubeWorld Alpha from 2013 with bug fixes.
